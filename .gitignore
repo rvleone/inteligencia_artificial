@@ -1,1 +1,59 @@
-/.vscode
+# ==============================================================================
+# .gitignore para Projeto de Ciência de Dados e Inteligência Artificial (Python)
+# ==============================================================================
+
+# --- Bytecode e Caches do Python ---
+__pycache__/
+*/__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# --- Ambientes Virtuais (Virtual Environments) ---
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# --- Jupyter Notebooks & Checkpoints ---
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# --- Ambientes de IDE e Editores ---
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# --- Arquivos Temporários do Microsoft Office (Word / Excel / PowerPoint) ---
+# Evita subir arquivos de trava gerados ao abrir relatórios .docx no Word
+~$*.docx
+~$*.doc
+~$*.xlsx
+~$*.pptx
+
+# --- Sistema Operacional (Windows / macOS / Linux) ---
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# --- Logs, Relatórios Temporários e Caches de Teste ---
+*.log
+*.tmp
+*.bak
+.pytest_cache/
+.coverage
+htmlcov/
