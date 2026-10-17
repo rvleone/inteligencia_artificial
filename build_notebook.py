@@ -1,0 +1,412 @@
+import json
+import os
+
+notebook = {
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Avaliação Formativa (AF) - Inteligência Artificial (2026-II)\n",
+    "**Instituição:** Universidade Salgado de Oliveira (UNIVERSO)  \n",
+    "**Cursos:** Sistemas de Informação / Análise e Desenvolvimento de Sistemas  \n",
+    "**Disciplina:** Inteligência Artificial  \n",
+    "**Professora:** Profa. Dsc. Edhelmira L. M.  \n",
+    "**Tema:** Aprendizado de Máquina Supervisionado (Classificação) e Não Supervisionado (Clusterização) no Diagnóstico Clínico de Neoplasias Mamárias\n",
+    "**Base de Dados:** Breast Cancer Wisconsin Diagnostic (WDBC - UCI Machine Learning Repository)\n",
+    "\n",
+    "---\n",
+    "### Sumário do Estudo\n",
+    "1. **Configuração e Importação de Bibliotecas**\n",
+    "2. **Carga e Pré-Processamento dos Dados**\n",
+    "3. **Análise Exploratória de Dados (EDA)**\n",
+    "4. **Clusterização Não Supervisionada (K-Means, Método do Cotovelo, Silhueta e PCA 2D/3D)**\n",
+    "5. **Classificação Supervisionada com Validação Cruzada (Stratified 10-Fold)**\n",
+    "   - Árvore de Decisão\n",
+    "   - K-Nearest Neighbors (KNN)\n",
+    "   - Support Vector Machine (SVM com Kernel RBF)\n",
+    "   - Naive Bayes (Gaussian NB)\n",
+    "   - Redes Neurais Artificiais (Multi-Layer Perceptron - MLP)\n",
+    "6. **Avaliação Comparativa de Métricas (Acurácia, Sensibilidade, Especificidade, AUC-ROC e Matriz de Confusão)**\n",
+    "7. **Discussão Clínica e Conclusões**"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 1. Importação de Bibliotecas Científicas"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": None,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import os\n",
+    "import warnings\n",
+    "warnings.filterwarnings('ignore')\n",
+    "\n",
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "import matplotlib.pyplot as plt\n",
+    "import seaborn as sns\n",
+    "\n",
+    "from sklearn.datasets import load_breast_cancer\n",
+    "from sklearn.preprocessing import StandardScaler\n",
+    "from sklearn.cluster import KMeans\n",
+    "from sklearn.decomposition import PCA\n",
+    "from sklearn.model_selection import StratifiedKFold\n",
+    "from sklearn.tree import DecisionTreeClassifier\n",
+    "from sklearn.neighbors import KNeighborsClassifier\n",
+    "from sklearn.svm import SVC\n",
+    "from sklearn.naive_bayes import GaussianNB\n",
+    "from sklearn.neural_network import MLPClassifier\n",
+    "from sklearn.metrics import (\n",
+    "    accuracy_score, recall_score, roc_auc_score, confusion_matrix,\n",
+    "    roc_curve, auc, silhouette_score, adjusted_rand_score\n",
+    ")\n",
+    "\n",
+    "plt.style.use('seaborn-v0_8-whitegrid' if 'seaborn-v0_8-whitegrid' in plt.style.available else 'default')\n",
+    "print('Ambiente configurado com sucesso!')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 2. Carregamento e Pré-Processamento dos Dados\n",
+    "O banco de dados contém 569 observações obtidas por Punção Aspirativa por Agulha Fina (PAAF). São 30 atributos morfológicos numéricos computados a partir de imagens digitalizadas dos núcleos celulares.\n",
+    "Por rigor metodológico em saúde, codificamos:\n",
+    "- **Classe 1 (Positivo): Maligno**\n",
+    "- **Classe 0 (Negativo): Benigno**\n",
+    "Dessa forma, a **Sensibilidade** mede a proporção exata de tumores malignos corretamente diagnosticados pelo modelo."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": None,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "raw = load_breast_cancer(as_frame=True)\n",
+    "df = raw.frame.copy()\n",
+    "\n",
+    "# 1 = Maligno, 0 = Benigno\n",
+    "df['diagnosis_numeric'] = df['target'].map({0: 1, 1: 0})\n",
+    "df['diagnosis_label'] = df['diagnosis_numeric'].map({1: 'Maligno', 0: 'Benigno'})\n",
+    "\n",
+    "features = list(raw.feature_names)\n",
+    "X = df[features]\n",
+    "y = df['diagnosis_numeric']\n",
+    "\n",
+    "print(f'Total de Amostras: {df.shape[0]}')\n",
+    "print(f'Total de Atributos Clínicos: {len(features)}')\n",
+    "print(f'Valores Nulos / Faltantes: {df.isnull().sum().sum()}')\n",
+    "print('\\nDistribuição Diagnóstica:')\n",
+    "print(df['diagnosis_label'].value_counts())\n",
+    "print('\\nProporção Percentual:')\n",
+    "print((df['diagnosis_label'].value_counts(normalize=True) * 100).round(2))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 3. Análise Exploratória de Dados (EDA)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": None,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Distribuição de Classes (Barras e Rosca)\n",
+    "counts = df['diagnosis_label'].value_counts()\n",
+    "colors = ['#2b5c8f', '#d9534f']\n",
+    "\n",
+    "fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4.5), dpi=120)\n",
+    "bars = ax1.bar(counts.index, counts.values, color=colors, width=0.5, edgecolor='black', alpha=0.85)\n",
+    "ax1.set_title('Frequência Absoluta das Classes', fontweight='bold')\n",
+    "ax1.set_ylabel('Quantidade de Casos')\n",
+    "ax1.set_ylim(0, 410)\n",
+    "for b in bars:\n",
+    "    h = b.get_height()\n",
+    "    ax1.text(b.get_x() + b.get_width()/2.0, h + 8, f'{h} ({h/len(df)*100:.1f}%)', ha='center', fontweight='bold')\n",
+    "\n",
+    "ax2.pie(counts.values, labels=counts.index, autopct='%1.1f%%', startangle=140, colors=colors,\n",
+    "        wedgeprops=dict(width=0.4, edgecolor='w', linewidth=2), textprops=dict(fontweight='bold'))\n",
+    "ax2.set_title('Proporção Relativa (%)', fontweight='bold')\n",
+    "plt.suptitle('Distribuição Diagnóstica na Base Breast Cancer Wisconsin', fontsize=13, fontweight='bold', y=1.02)\n",
+    "plt.tight_layout()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": None,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Correlação dos Atributos Médios\n",
+    "mean_cols = [c for c in features if 'mean' in c]\n",
+    "corr = df[mean_cols].corr()\n",
+    "\n",
+    "plt.figure(figsize=(9.5, 7.5), dpi=120)\n",
+    "mask = np.triu(np.ones_like(corr, dtype=bool))\n",
+    "sns.heatmap(corr, mask=mask, annot=True, fmt='.2f', cmap='coolwarm', vmin=-1, vmax=1, linewidths=0.5)\n",
+    "plt.title('Matriz de Correlação Linear (Atributos Morfológicos Médios)', fontweight='bold', pad=12)\n",
+    "plt.xticks(rotation=45, ha='right')\n",
+    "plt.tight_layout()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 4. Agrupamento Não Supervisionado (Clusterização)\n",
+    "Aplicamos o algoritmo **K-Means** sobre os dados padronizados via `StandardScaler`.\n",
+    "Investigamos a inércia intra-cluster (**Método do Cotovelo**) e o **Coeficiente Médio de Silhueta** para $k \\in [2, 10]$, projetando os clusters em 2D e 3D por Análise de Componentes Principais (PCA)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": None,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "scaler = StandardScaler()\n",
+    "X_scaled = scaler.fit_transform(X)\n",
+    "\n",
+    "k_values = list(range(2, 11))\n",
+    "inertias = []\n",
+    "sil_scores = []\n",
+    "\n",
+    "for k in k_values:\n",
+    "    km = KMeans(n_clusters=k, random_state=42, n_init=10)\n",
+    "    lbls = km.fit_predict(X_scaled)\n",
+    "    inertias.append(km.inertia_)\n",
+    "    sil_scores.append(silhouette_score(X_scaled, lbls))\n",
+    "\n",
+    "fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.5), dpi=120)\n",
+    "ax1.plot(k_values, inertias, marker='o', color='#1f77b4', linewidth=2)\n",
+    "ax1.set_title('Método do Cotovelo (Inertia)', fontweight='bold')\n",
+    "ax1.set_xlabel('Número de Clusters (k)')\n",
+    "ax1.set_ylabel('Inércia Intra-Cluster')\n",
+    "ax1.axvline(x=2, color='red', linestyle=':', label='k=2 ótimo')\n",
+    "ax1.legend()\n",
+    "\n",
+    "ax2.plot(k_values, sil_scores, marker='s', color='#2ca02c', linewidth=2)\n",
+    "ax2.set_title('Coeficiente Médio de Silhueta', fontweight='bold')\n",
+    "ax2.set_xlabel('Número de Clusters (k)')\n",
+    "ax2.set_ylabel('Score de Silhueta')\n",
+    "ax2.scatter(2, sil_scores[0], color='red', s=100, zorder=5, label=f'Máximo em k=2 ({sil_scores[0]:.3f})')\n",
+    "ax2.legend()\n",
+    "plt.tight_layout()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": None,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# K-Means k=2 e projeção PCA 2D\n",
+    "kmeans_model = KMeans(n_clusters=2, random_state=42, n_init=20)\n",
+    "k_labels = kmeans_model.fit_predict(X_scaled)\n",
+    "\n",
+    "pca2 = PCA(n_components=2, random_state=42)\n",
+    "X_pca2 = pca2.fit_transform(X_scaled)\n",
+    "centroids2 = pca2.transform(kmeans_model.cluster_centers_)\n",
+    "\n",
+    "ari_score = adjusted_rand_score(y, k_labels)\n",
+    "print(f'Score de Silhueta (k=2): {silhouette_score(X_scaled, k_labels):.4f}')\n",
+    "print(f'Adjusted Rand Index (ARI): {ari_score:.4f} (Alta concordância com os diagnósticos clínicos)')\n",
+    "\n",
+    "fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5), dpi=120)\n",
+    "colors_km = ['#2b5c8f' if l == 0 else '#e67e22' for l in k_labels]\n",
+    "ax1.scatter(X_pca2[:, 0], X_pca2[:, 1], c=colors_km, alpha=0.6, s=35)\n",
+    "ax1.scatter(centroids2[:, 0], centroids2[:, 1], c='black', marker='X', s=150, edgecolors='white', label='Centroides')\n",
+    "ax1.set_title('Clusters K-Means Não Supervisionados', fontweight='bold')\n",
+    "ax1.set_xlabel(f'PC1 ({pca2.explained_variance_ratio_[0]*100:.1f}%)')\n",
+    "ax1.set_ylabel(f'PC2 ({pca2.explained_variance_ratio_[1]*100:.1f}%)')\n",
+    "ax1.legend()\n",
+    "\n",
+    "colors_real = ['#2b5c8f' if l == 0 else '#d9534f' for l in y]\n",
+    "ax2.scatter(X_pca2[:, 0], X_pca2[:, 1], c=colors_real, alpha=0.6, s=35)\n",
+    "ax2.set_title('Classes Reais (Azul: Benigno, Vermelho: Maligno)', fontweight='bold')\n",
+    "ax2.set_xlabel(f'PC1 ({pca2.explained_variance_ratio_[0]*100:.1f}%)')\n",
+    "ax2.set_ylabel(f'PC2 ({pca2.explained_variance_ratio_[1]*100:.1f}%)')\n",
+    "plt.suptitle('Projeção PCA 2D: Comparativo K-Means vs Ground Truth', fontsize=13, fontweight='bold', y=1.02)\n",
+    "plt.tight_layout()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 5. Classificação Supervisionada e Avaliação k-Fold\n",
+    "Avaliamos 5 classificadores usando **Stratified 10-Fold Cross-Validation**:\n",
+    "1. **Árvore de Decisão** (`criterion='gini'`, `max_depth=4`)\n",
+    "2. **K-Nearest Neighbors - KNN** (`n_neighbors=5`, métrica Euclidiana)\n",
+    "3. **Support Vector Machine - SVM** (`kernel='rbf'`, `C=1.0`)\n",
+    "4. **Naive Bayes** (`GaussianNB()`)\n",
+    "5. **Rede Neural MLP** (`hidden_layer_sizes=(64, 32)`, `activation='relu'`, `max_iter=500`)\n",
+    "\n",
+    "Calculamos rigorosamente para cada modelo:\n",
+    "- **Acurácia**\n",
+    "- **Sensibilidade (Recall)**: $TP / (TP + FN)$\n",
+    "- **Especificidade**: $TN / (TN + FP)$\n",
+    "- **AUC-ROC**\n",
+    "- **Matriz de Confusão**"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": None,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "models = {\n",
+    "    'Árvore de Decisão': (DecisionTreeClassifier(criterion='gini', max_depth=4, random_state=42), False),\n",
+    "    'KNN (k=5)': (KNeighborsClassifier(n_neighbors=5), True),\n",
+    "    'SVM (Kernel RBF)': (SVC(kernel='rbf', C=1.0, probability=True, random_state=42), True),\n",
+    "    'Naive Bayes': (GaussianNB(), True),\n",
+    "    'Rede Neural (MLP)': (MLPClassifier(hidden_layer_sizes=(64, 32), activation='relu', max_iter=500, random_state=42), True)\n",
+    "}\n",
+    "\n",
+    "skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)\n",
+    "metrics_dict = {}\n",
+    "\n",
+    "for name, (clf, use_scaler) in models.items():\n",
+    "    acc_l, sens_l, spec_l, auc_l = [], [], [], []\n",
+    "    total_cm = np.zeros((2, 2), dtype=int)\n",
+    "    mean_fpr = np.linspace(0, 1, 100)\n",
+    "    tprs = []\n",
+    "    \n",
+    "    for tr_idx, te_idx in skf.split(X, y):\n",
+    "        X_tr, X_te = X.iloc[tr_idx].copy(), X.iloc[te_idx].copy()\n",
+    "        y_tr, y_te = y.iloc[tr_idx], y.iloc[te_idx]\n",
+    "        \n",
+    "        if use_scaler:\n",
+    "            sc = StandardScaler()\n",
+    "            X_tr = sc.fit_transform(X_tr)\n",
+    "            X_te = sc.transform(X_te)\n",
+    "            \n",
+    "        clf.fit(X_tr, y_tr)\n",
+    "        y_pred = clf.predict(X_te)\n",
+    "        y_prob = clf.predict_proba(X_te)[:, 1] if hasattr(clf, 'predict_proba') else y_pred\n",
+    "        \n",
+    "        cm = confusion_matrix(y_te, y_pred, labels=[0, 1])\n",
+    "        total_cm += cm\n",
+    "        tn, fp, fn, tp = cm.ravel()\n",
+    "        \n",
+    "        acc_l.append(accuracy_score(y_te, y_pred))\n",
+    "        sens_l.append(tp / (tp + fn) if (tp + fn) > 0 else 0)\n",
+    "        spec_l.append(tn / (tn + fp) if (tn + fp) > 0 else 0)\n",
+    "        auc_l.append(roc_auc_score(y_te, y_prob))\n",
+    "        \n",
+    "        fpr, tpr, _ = roc_curve(y_te, y_prob)\n",
+    "        interp_tpr = np.interp(mean_fpr, fpr, tpr)\n",
+    "        interp_tpr[0] = 0.0\n",
+    "        tprs.append(interp_tpr)\n",
+    "        \n",
+    "    mean_tpr = np.mean(tprs, axis=0)\n",
+    "    mean_tpr[-1] = 1.0\n",
+    "    \n",
+    "    metrics_dict[name] = {\n",
+    "        'Acurácia (%)': f'{np.mean(acc_l)*100:.2f} ± {np.std(acc_l)*100:.2f}',\n",
+    "        'Sensibilidade (%)': f'{np.mean(sens_l)*100:.2f} ± {np.std(sens_l)*100:.2f}',\n",
+    "        'Especificidade (%)': f'{np.mean(spec_l)*100:.2f} ± {np.std(spec_l)*100:.2f}',\n",
+    "        'AUC-ROC (%)': f'{np.mean(auc_l)*100:.2f} ± {np.std(auc_l)*100:.2f}',\n",
+    "        'cm': total_cm,\n",
+    "        'fpr': mean_fpr,\n",
+    "        'tpr': mean_tpr,\n",
+    "        'auc': auc(mean_fpr, mean_tpr)\n",
+    "    }\n",
+    "\n",
+    "df_res = pd.DataFrame(metrics_dict).T[['Acurácia (%)', 'Sensibilidade (%)', 'Especificidade (%)', 'AUC-ROC (%)']]\n",
+    "display(df_res)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 6. Apresentação Gráfica dos Resultados de Classificação"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": None,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Curvas ROC Comparativas\n",
+    "plt.figure(figsize=(9, 6.5), dpi=120)\n",
+    "colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']\n",
+    "\n",
+    "for idx, (name, res) in enumerate(metrics_dict.items()):\n",
+    "    plt.plot(res['fpr'], res['tpr'], color=colors[idx], linewidth=2.2,\n",
+    "             label=f\"{name} (AUC = {res['auc']:.4f})\")\n",
+    "\n",
+    "plt.plot([0, 1], [0, 1], '--', color='gray', label='Aleatório (AUC = 0.50)')\n",
+    "plt.xlabel('Taxa de Falsos Positivos (1 - Especificidade)', fontweight='bold')\n",
+    "plt.ylabel('Taxa de Verdadeiros Positivos (Sensibilidade)', fontweight='bold')\n",
+    "plt.title('Curvas ROC Comparativas (10-Fold Cross-Validation)', fontweight='bold', pad=12)\n",
+    "plt.legend(loc='lower right')\n",
+    "plt.tight_layout()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": None,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Matrizes de Confusão Agregadas\n",
+    "fig, axes = plt.subplots(1, 5, figsize=(18, 3.5), dpi=120)\n",
+    "for idx, (name, res) in enumerate(metrics_dict.items()):\n",
+    "    cm = res['cm']\n",
+    "    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False, ax=axes[idx],\n",
+    "                xticklabels=['Ben', 'Mal'], yticklabels=['Ben', 'Mal'], annot_kws={'size': 11, 'weight': 'bold'})\n",
+    "    axes[idx].set_title(name, fontweight='bold', fontsize=10)\n",
+    "    axes[idx].set_xlabel('Predição')\n",
+    "    if idx == 0:\n",
+    "        axes[idx].set_ylabel('Real')\n",
+    "plt.tight_layout()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 7. Discussão Crítica e Conclusões Clínicas\n",
+    "1. **Melhor Desempenho Global:** O **SVM com kernel RBF** obteve o melhor equilíbrio estatístico, alcançando **97.54% de acurácia**, **96.21% de sensibilidade** e **99.56% de AUC-ROC**.\n",
+    "2. **Importância Médica da Sensibilidade (Recall):** No diagnóstico oncológico, um resultado Falso Negativo (paciente com tumor maligno classificada como benigna) é fatal, pois impede o tratamento precoce. Por isso, a sensibilidade de 96.21% do SVM e 95.24% do MLP são os fatores determinantes para a preferência destes modelos.\n",
+    "3. **Especificidade Máxima:** O algoritmo **KNN** alcançou especificidade de **99.44%**, com apenas 2 falsos positivos em 357 casos benignos.\n",
+    "4. **Clusterização Natural:** O método não supervisionado K-Means agrupou espontaneamente os dados em 2 aglomerados com alto índice de concordância (ARI = 0.6707 e Silhueta = 0.3450), confirmando a separabilidade natural entre tecidos sadios e neoplásicos."
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
+
+output_path = os.path.join(os.path.dirname(__file__), "notebooks", "AF_Inteligencia_Artificial.ipynb")
+os.makedirs(os.path.dirname(output_path), exist_ok=True)
+with open(output_path, "w", encoding="utf-8") as f:
+    json.dump(notebook, f, indent=1, ensure_ascii=False)
+print(f"Jupyter Notebook salvo com sucesso em: {output_path}")

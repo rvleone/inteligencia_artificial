@@ -1,0 +1,44 @@
+================================================================================
+UNIVERSIDADE SALGADO DE OLIVEIRA (UNIVERSO) - EDUCAÇÃO A DISTÂNCIA (EAD)
+CURSOS: SISTEMAS DE INFORMAÇÃO / ANÁLISE E DESENVOLVIMENTO DE SISTEMAS
+DISCIPLINA: INTELIGÊNCIA ARTIFICIAL - SEMESTRE 2026-II
+PROFESSORA: PROFA. DSC. EDHELMIRA L. M.
+AVALIAÇÃO FORMATIVA (AF) - ENTREGA DE LINKS E MATERIAIS
+================================================================================
+
+DADOS DO ALUNO:
+--------------------------------------------------------------------------------
+Nome Completo: [Preencha seu Nome Completo]
+Matrícula: [Preencha sua Matrícula]
+Curso: [Sistemas de Informação / Análise e Desenvolvimento de Sistemas]
+Polo: [Preencha seu Polo]
+
+
+1. LINK DA GRAVAÇÃO DA APRESENTAÇÃO (VÍDEO COM ROSTO DO ALUNO):
+--------------------------------------------------------------------------------
+Link: [COLE AQUI O LINK DO SEU VÍDEO NO GOOGLE DRIVE OU YOUTUBE]
+*Observação: Certifique-se de que o link está configurado como "Qualquer pessoa com o link pode visualizar" (ou "Não listado" no YouTube), sem exigir permissão de acesso.
+
+
+2. LINK DO CÓDIGO FONTE (REPOSITÓRIO GITHUB):
+--------------------------------------------------------------------------------
+Link: [COLE AQUI O LINK DO SEU REPOSITÓRIO GITHUB, EX: https://github.com/seunome/af-inteligencia-artificial]
+*Observação: Repositório público contendo o notebook .ipynb, código modular em /src, gráficos em /outputs e scripts.
+
+
+3. ARQUIVO DO BANCO DE DADOS:
+--------------------------------------------------------------------------------
+Nome do Dataset: Breast Cancer Wisconsin (Diagnostic) - WDBC
+Origem: UCI Machine Learning Repository (mantido pelo Dr. William H. Wolberg)
+Arquivo local anexado: data/breast_cancer_wisconsin.csv
+Link de acesso público ao banco de dados:
+https://archive.ics.uci.edu/dataset/17/breast+cancer+wisconsin+diagnostic
+
+
+4. ARQUIVOS ENTREGUES / ENVIADOS VIA AVA:
+--------------------------------------------------------------------------------
+[X] Relatório Final em PDF (Relatorio_AF_Inteligencia_Artificial.pdf)
+[X] Este arquivo de texto com os links (links_e_entrega.txt)
+[X] Código Fonte e Notebook executável (AF_Inteligencia_Artificial.ipynb)
+[X] Arquivo do Banco de Dados (breast_cancer_wisconsin.csv)
+================================================================================

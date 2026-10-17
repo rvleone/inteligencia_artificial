@@ -1,0 +1,6 @@
+Modelo,Acurácia (%),Acurácia Desvio,Sensibilidade (%),Sensibilidade Desvio,Especificidade (%),Especificidade Desvio,AUC-ROC (%),AUC Desvio,Verdadeiros Positivos (TP),Verdadeiros Negativos (TN),Falsos Positivos (FP),Falsos Negativos (FN)
+Árvore de Decisão,91.04,3.87,85.8,10.24,94.13,4.56,91.45,7.34,182,336,21,30
+K-Nearest Neighbors (KNN),97.01,1.76,92.9,4.9,99.44,1.11,98.68,1.46,197,355,2,15
+Support Vector Machine (SVM),97.54,1.95,96.21,3.56,98.33,2.83,99.56,0.55,204,351,6,8
+Naive Bayes,93.15,3.08,89.57,7.65,95.26,4.82,98.56,1.12,190,340,17,22
+Rede Neural (MLP),96.84,1.89,95.24,5.63,97.75,2.45,99.26,1.0,202,349,8,10

@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apresentação AF - Inteligência Artificial (2026-II) | UNIVERSO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: radial-gradient(circle at top right, #0d1b2a, #1b263b, #0f172a);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.12);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-blue: #38bdf8;
+            --accent-green: #34d399;
+            --accent-orange: #fb923c;
+            --accent-purple: #c084fc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Bar */
+        header {
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            background: rgba(13, 27, 42, 0.6);
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-badge {
+            background: linear-gradient(135deg, #2563eb, #38bdf8);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+        }
+
+        .brand-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+
+        .slide-counter {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+            background: rgba(56, 189, 248, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        /* Slide Container */
+        .slide-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            max-width: 1250px;
+            height: calc(100vh - 160px);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2.5rem 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(16px);
+            animation: fadeIn 0.4s ease forwards;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Typography */
+        .slide-tag {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-blue);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .slide-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-body {
+            flex: 1;
+            display: grid;
+            gap: 2rem;
+        }
+
+        .grid-2col {
+            grid-template-columns: 1fr 1.2fr;
+            align-items: center;
+        }
+
+        .grid-cards {
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Content Blocks */
+        .info-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .info-card:hover {
+            border-color: rgba(56, 189, 248, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .info-card h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-card p,
+        .info-card li {
+            font-size: 0.92rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        .info-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-card li {
+            position: relative;
+            padding-left: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card li::before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: var(--accent-blue);
+            font-weight: bold;
+        }
+
+        /* Image Display */
+        .image-container {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: 380px;
+            border-radius: 8px;
+            object-fit: contain;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .image-caption {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 0.75rem;
+            font-style: italic;
+        }
+
+        /* Metric Highlights */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-box {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.25rem 1rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--accent-blue);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        /* Table Styling */
+        .styled-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .styled-table th,
+        .styled-table td {
+            padding: 0.85rem 1rem;
+            text-align: center;
+        }
+
+        .styled-table th {
+            background: rgba(30, 41, 59, 0.9);
+            color: #e2e8f0;
+            font-weight: 700;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .styled-table tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .styled-table tr:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .styled-table td:first-child {
+            text-align: left;
+            font-weight: 600;
+            color: #f8fafc;
+        }
+
+        .highlight-row {
+            background: rgba(56, 189, 248, 0.1) !important;
+            border-left: 3px solid var(--accent-blue);
+        }
+
+        /* Navigation Controls */
+        footer {
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(13, 27, 42, 0.6);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            border-color: #3b82f6;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            color: white;
+        }
+
+        .keyboard-hint {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        kbd {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #cbd5e1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="brand">
+            <span class="brand-badge">UNIVERSO</span>
+            <span class="brand-title">Inteligência Artificial • Avaliação Formativa (AF 2026-II)</span>
+        </div>
+        <div class="slide-counter" id="slideCounter">Slide 1 de 8</div>
+    </header>
+
+    <div class="slide-wrapper">
+        <!-- SLIDE 1: CAPA -->
+        <section class="slide active" id="slide-1">
+            <div
+                style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <span class="slide-tag">Apresentação Técnica da Avaliação Formativa</span>
+                <h1 class="slide-title" style="font-size: 2.8rem; max-width: 900px; margin-bottom: 1.5rem;">
+                    Aprendizado de Máquina Supervisionado e Não Supervisionado no Diagnóstico de Câncer de Mama
+                </h1>
+                <p
+                    style="font-size: 1.2rem; color: #94a3b8; max-width: 750px; margin-bottom: 2.5rem; line-height: 1.6;">
+                    Estudo comparativo de Classificação (SVM, MLP, KNN, Naive Bayes, Árvore de Decisão) e Clusterização
+                    (K-Means com PCA) sobre a base pública Breast Cancer Wisconsin (WDBC).
+                </p>
+                <div
+                    style="display: flex; gap: 2rem; background: rgba(255,255,255,0.04); padding: 1.2rem 2.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                    <div>
+                        <div style="font-size: 0.75rem; text-transform: uppercase; color: #64748b;">Aluno / Pesquisador
+                        </div>
+                        <div style="font-weight: 700; color: #f8fafc; font-size: 1.05rem;">Ricardo Vieira Leone</div>
+                    </div>
+                    <div style="border-left: 1px solid rgba(255,255,255,0.1); padding-left: 2rem;">
+                        <div style="font-size: 0.75rem; text-transform: uppercase; color: #64748b;">Orientação Docente
+                        </div>
+                        <div style="font-weight: 700; color: #f8fafc; font-size: 1.05rem;">Profa. Dsc. Edhelmira L. M.
+                        </div>
+                    </div>
+                    <div style="border-left: 1px solid rgba(255,255,255,0.1); padding-left: 2rem;">
+                        <div style="font-size: 0.75rem; text-transform: uppercase; color: #64748b;">Curso & Polo</div>
+                        <div style="font-weight: 700; color: #f8fafc; font-size: 1.05rem;">Sistemas de Informação / ADS
+                            - UNIVERSO</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: INTRODUÇÃO E BANCO DE DADOS -->
+        <section class="slide" id="slide-2">
+            <span class="slide-tag">01. Contexto e Dados</span>
+            <h2 class="slide-title">Formulação do Problema & Base de Dados (UCI WDBC)</h2>
+            <div class="slide-body grid-2col">
+                <div>
+                    <div class="info-card" style="margin-bottom: 1.2rem;">
+                        <h3>🩺 Contextualização Clínica</h3>
+                        <p>O câncer de mama é a neoplasia maligna de maior incidência em mulheres. O diagnóstico
+                            diferencial precoce via biópsia por agulha fina (PAAF) é crucial para o aumento das taxas de
+                            sobrevida.</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>📊 Estrutura do Dataset</h3>
+                        <ul>
+                            <li><strong>Origem:</strong> UCI Machine Learning Repository (Dr. William Wolberg).</li>
+                            <li><strong>Volume:</strong> 569 observações clínicas e 0 valores ausentes.</li>
+                            <li><strong>Atributos:</strong> 30 variáveis contínuas baseadas em 10 medidas geométricas
+                                nucleares (raio, textura, perímetro, área, etc.).</li>
+                            <li><strong>Classes:</strong> 357 Benignos (62,7%) e 212 Malignos (37,3%).</li>
+                            <li><strong>Target:</strong> Codificado como 1 = Maligno (Positivo) para que a Sensibilidade
+                                reflita a taxa exata de detecção tumoral.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="image-container">
+                    <img src="../outputs/eda_distribuicao_classes.png" alt="Distribuição de Classes">
+                    <div class="image-caption">Figura 1: Proporção Diagnóstica (Benigno vs Maligno)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: ANÁLISE EXPLORATÓRIA -->
+        <section class="slide" id="slide-3">
+            <span class="slide-tag">02. Pré-Processamento</span>
+            <h2 class="slide-title">Análise Exploratória & Padronização de Variáveis</h2>
+            <div class="slide-body grid-2col">
+                <div class="image-container">
+                    <img src="../outputs/eda_matriz_correlacao.png" alt="Matriz de Correlação">
+                    <div class="image-caption">Figura 2: Matriz de Correlação Linear de Pearson</div>
+                </div>
+                <div>
+                    <div class="info-card" style="margin-bottom: 1.2rem;">
+                        <h3>🔬 Principais Achados Exploratórios</h3>
+                        <ul>
+                            <li><strong>Altíssima Colinearidade:</strong> Correlações acima de 0,98 entre raio,
+                                perímetro e área média dos núcleos.</li>
+                            <li><strong>Poder Discriminante:</strong> Células malignas apresentam perímetro e
+                                concavidade substancialmente maiores.</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <h3>⚙️ Padronização Z-Score (StandardScaler)</h3>
+                        <p style="margin-bottom: 0.5rem;">Como os atributos operam em escalas distintas (área > 2000 vs
+                            suavidade ~ 0,1), a normalização é mandatória para KNN, SVM, K-Means e Redes Neurais.</p>
+                        <p style="color: var(--accent-green); font-weight: 600;">🔒 Prevenção de Data Leakage: A
+                            padronização foi estritamente calculada dentro de cada fold de treino da validação cruzada.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: CLUSTERIZAÇÃO NÃO SUPERVISIONADA -->
+        <section class="slide" id="slide-4">
+            <span class="slide-tag">03. Aprendizado Não Supervisionado</span>
+            <h2 class="slide-title">Clusterização (K-Means) & Projeção Espacial (PCA)</h2>
+            <div class="slide-body grid-2col">
+                <div>
+                    <div class="info-card" style="margin-bottom: 1.2rem;">
+                        <h3>🎯 Determinação Ótima de Clusters</h3>
+                        <ul>
+                            <li><strong>Método do Cotovelo:</strong> Inflexão na inércia confirma redução acentuada de
+                                variância intra-cluster em k=2.</li>
+                            <li><strong>Coeficiente de Silhueta:</strong> Atinge ápice global em <strong>k=2
+                                    (0,3450)</strong>.</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <h3>🌐 Projeção PCA & Concordância Biológica</h3>
+                        <ul>
+                            <li><strong>Variância Explicada:</strong> 63,2% em 2D (PC1=44,3%, PC2=19,0%) e 72,6% em 3D.
+                            </li>
+                            <li><strong>Adjusted Rand Index (ARI):</strong> <strong>0,6707</strong> com as anotações
+                                médicas reais.</li>
+                            <li><strong>Conclusão:</strong> Os dados morfológicos celulares segregam naturalmente em
+                                grupos patológicos mesmo sem rótulos prévios.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="image-container">
+                    <img src="../outputs/cluster_pca_2d.png" alt="Projeção PCA 2D">
+                    <div class="image-caption">Figura 3: Comparativo entre Clusters K-Means e Diagnóstico Real</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: CLASSIFICAÇÃO SUPERVISIONADA E METODOLOGIA -->
+        <section class="slide" id="slide-5">
+            <span class="slide-tag">04. Aprendizado Supervisionado</span>
+            <h2 class="slide-title">Modelos Implementados & Validação Stratified 10-Fold</h2>
+            <div class="slide-body grid-cards">
+                <div class="info-card">
+                    <h3 style="color: var(--accent-blue);">🌳 Árvore de Decisão</h3>
+                    <p><strong>Hiperparâmetros:</strong> Impureza Gini, max_depth=4, min_samples_split=5.</p>
+                    <p><strong>Vantagem:</strong> Transparência total e regras de decisão explicáveis para a junta
+                        médica.</p>
+                </div>
+                <div class="info-card">
+                    <h3 style="color: var(--accent-green);">📍 K-Nearest Neighbors (KNN)</h3>
+                    <p><strong>Hiperparâmetros:</strong> k=5 vizinhos, distância euclidiana após Z-score.</p>
+                    <p><strong>Vantagem:</strong> Excelente identificação de vizinhança celular de casos sadios.</p>
+                </div>
+                <div class="info-card" style="border-color: rgba(56, 189, 248, 0.4);">
+                    <h3 style="color: var(--accent-orange);">⚡ Support Vector Machine (SVM)</h3>
+                    <p><strong>Hiperparâmetros:</strong> Kernel RBF, regularização C=1.0.</p>
+                    <p><strong>Vantagem:</strong> Mapeamento não linear de alta dimensionalidade; melhor fronteira de
+                        margem.</p>
+                </div>
+                <div class="info-card">
+                    <h3 style="color: var(--accent-purple);">📈 Naive Bayes Gaussiano</h3>
+                    <p><strong>Hiperparâmetros:</strong> Distribuição Gaussiana contínua.</p>
+                    <p><strong>Vantagem:</strong> Modelo probabilístico Bayesiano ultra veloz com baseline consistente.
+                    </p>
+                </div>
+                <div class="info-card">
+                    <h3 style="color: #f43f5e;">🧠 Rede Neural (MLP)</h3>
+                    <p><strong>Hiperparâmetros:</strong> 2 camadas ocultas (64, 32), ativação ReLU, otimizador Adam.</p>
+                    <p><strong>Vantagem:</strong> Alta capacidade de aproximação de funções complexas.</p>
+                </div>
+                <div class="info-card" style="background: rgba(56, 189, 248, 0.08);">
+                    <h3 style="color: white;">🛡️ Validação Cruzada</h3>
+                    <p><strong>Stratified 10-Fold:</strong> Preserva a proporção exata de 62,7% benignos e 37,3%
+                        malignos em cada dobra de teste, garantindo rigor estatístico sem viés de partição única.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: TABELA DE RESULTADOS COMPARATIVOS -->
+        <section class="slide" id="slide-6">
+            <span class="slide-tag">05. Resultados Experimentais</span>
+            <h2 class="slide-title">Desempenho Geral dos Classificadores</h2>
+            <div class="slide-body">
+                <div class="stat-grid">
+                    <div class="stat-box">
+                        <div class="stat-value">97,54%</div>
+                        <div class="stat-label">Melhor Acurácia (SVM)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" style="color: var(--accent-green);">96,21%</div>
+                        <div class="stat-label">Sensibilidade Máxima (SVM)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" style="color: var(--accent-orange);">99,44%</div>
+                        <div class="stat-label">Especificidade Máxima (KNN)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" style="color: var(--accent-purple);">99,56%</div>
+                        <div class="stat-label">AUC-ROC Máxima (SVM)</div>
+                    </div>
+                </div>
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Algoritmo</th>
+                            <th>Acurácia (%)</th>
+                            <th>Sensibilidade (Recall) (%)</th>
+                            <th>Especificidade (%)</th>
+                            <th>AUC-ROC (%)</th>
+                            <th>Falsos Negativos (FN)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Árvore de Decisão</td>
+                            <td>91,04 ± 3,87</td>
+                            <td>85,80 ± 10,24</td>
+                            <td>94,13 ± 4,56</td>
+                            <td>91,45 ± 7,34</td>
+                            <td>30</td>
+                        </tr>
+                        <tr>
+                            <td>K-Nearest Neighbors (KNN)</td>
+                            <td>97,01 ± 1,76</td>
+                            <td>92,90 ± 4,90</td>
+                            <td>99,44 ± 1,11</td>
+                            <td>98,68 ± 1,46</td>
+                            <td>15</td>
+                        </tr>
+                        <tr class="highlight-row">
+                            <td>Support Vector Machine (SVM) 🏆</td>
+                            <td>97,54 ± 1,95</td>
+                            <td>96,21 ± 3,56</td>
+                            <td>98,33 ± 2,83</td>
+                            <td>99,56 ± 0,55</td>
+                            <td>8 (Menor taxa de erro)</td>
+                        </tr>
+                        <tr>
+                            <td>Naive Bayes Gaussiano</td>
+                            <td>93,15 ± 3,08</td>
+                            <td>89,57 ± 7,65</td>
+                            <td>95,26 ± 4,82</td>
+                            <td>98,56 ± 1,12</td>
+                            <td>22</td>
+                        </tr>
+                        <tr>
+                            <td>Redes Neurais (MLP)</td>
+                            <td>96,84 ± 1,89</td>
+                            <td>95,24 ± 5,63</td>
+                            <td>97,75 ± 2,45</td>
+                            <td>99,26 ± 1,00</td>
+                            <td>10</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: CURVAS ROC E MATRIZES DE CONFUSÃO -->
+        <section class="slide" id="slide-7">
+            <span class="slide-tag">06. Métricas Gráficas</span>
+            <h2 class="slide-title">Curvas ROC & Matrizes de Confusão Agregadas</h2>
+            <div class="slide-body grid-2col">
+                <div class="image-container">
+                    <img src="../outputs/curvas_roc_comparativas.png" alt="Curvas ROC">
+                    <div class="image-caption">Figura 4: Curvas ROC Sobrepostas (10-Fold CV)</div>
+                </div>
+                <div class="image-container">
+                    <img src="../outputs/matrizes_confusao.png" alt="Matrizes de Confusão">
+                    <div class="image-caption">Figura 5: Matrizes de Confusão Agregadas (569 Amostras)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: DISCUSSÃO E CONCLUSÕES -->
+        <section class="slide" id="slide-8">
+            <span class="slide-tag">07. Síntese e Conclusão</span>
+            <h2 class="slide-title">Discussão Clínica & Considerações Finais</h2>
+            <div class="slide-body grid-2col">
+                <div class="info-card">
+                    <h3>💡 Por que a Sensibilidade é Vital?</h3>
+                    <p style="margin-bottom: 0.75rem;">Em oncologia, o custo de um <strong>Falso Negativo</strong> é
+                        fatal (a paciente não recebe o tratamento oportuno). Portanto, um modelo com sensibilidade
+                        elevada é prioritário em relação a modelos com menor recall.</p>
+                    <p>O <strong>SVM com Kernel RBF</strong> cometeu apenas <strong>8 falsos negativos</strong> em 212
+                        casos malignos (sensibilidade de 96,21%), consagrando-se como a melhor ferramenta clínica de
+                        apoio à decisão.</p>
+                </div>
+                <div class="info-card">
+                    <h3>🎯 Conclusões do Trabalho</h3>
+                    <ul>
+                        <li><strong>Clusterização:</strong> Demonstrou a viabilidade de separação patológica não
+                            supervisionada (ARI=0,6707).</li>
+                        <li><strong>Classificação:</strong> SVM e MLP demonstraram performance de ponta, superando 96%
+                            de acurácia e 99% de AUC.</li>
+                        <li><strong>KNN:</strong> Ofereceu especificidade quase perfeita (99,44%), errando somente 2
+                            casos benignos.</li>
+                        <li><strong>Trabalhos Futuros:</strong> Investigação de algoritmos ensemble (Random Forest,
+                            XGBoost) e seleção de atributos via LASSO.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="keyboard-hint">
+            Dica: Use as setas do teclado <kbd>←</kbd> <kbd>→</kbd> ou <kbd>Espaço</kbd> para navegar | <kbd>F</kbd>
+            para tela cheia
+        </div>
+        <div class="nav-buttons">
+            <button class="btn" id="prevBtn" onclick="changeSlide(-1)">Anterior</button>
+            <button class="btn btn-primary" id="nextBtn" onclick="changeSlide(1)">Próximo</button>
+        </div>
+    </footer>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 8;
+
+        function updateSlide() {
+            document.querySelectorAll('.slide').forEach((s, idx) => {
+                s.classList.remove('active');
+                if (idx + 1 === currentSlide) {
+                    s.classList.add('active');
+                }
+            });
+            document.getElementById('slideCounter').innerText = `Slide ${currentSlide} de ${totalSlides}`;
+            document.getElementById('prevBtn').disabled = currentSlide === 1;
+            document.getElementById('nextBtn').innerText = currentSlide === totalSlides ? 'Início' : 'Próximo';
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide > totalSlides) currentSlide = 1;
+            if (currentSlide < 1) currentSlide = 1;
+            updateSlide();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                changeSlide(-1);
+            } else if (e.key.toLowerCase() === 'f') {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(() => { });
+                } else {
+                    document.exitFullscreen().catch(() => { });
+                }
+            }
+        });
+
+        updateSlide();
+    </script>
+</body>
+
+</html>
